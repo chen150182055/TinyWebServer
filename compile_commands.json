@@ -4,7 +4,6 @@
   "arguments": [
    "g++",
    "-o",
-   "-Wall",
    "server",
    "main.cpp",
    "timer/lst_timer.cpp",
