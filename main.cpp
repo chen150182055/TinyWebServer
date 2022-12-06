@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
     //需要修改的数据库信息,登录名,密码,库名
     string user = "root";
-    string passwd = "5201314";
+    string passwd = "chen13076167297.";
     string databasename = "qgydb";
 
     //命令行解析

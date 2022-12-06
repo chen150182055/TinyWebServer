@@ -25,24 +25,24 @@ connection_pool *connection_pool::GetInstance()
 //构造初始化
 void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, int MaxConn, int close_log)
 {
-	m_url = url;
-	m_Port = Port;
-	m_User = User;
-	m_PassWord = PassWord;
-	m_DatabaseName = DBName;
-	m_close_log = close_log;
+	m_url = url;    //主机号
+	m_Port = Port;  //端口号
+	m_User = User;  //用户名
+	m_PassWord = PassWord;  //密码
+	m_DatabaseName = DBName;//数据库名
+	m_close_log = close_log;//日志开关
 
 	for (int i = 0; i < MaxConn; i++)
 	{
 		MYSQL *con = NULL;
-		con = mysql_init(con);
+		con = mysql_init(con);  //初始化mysql连接
 
 		if (con == NULL)
 		{
 			LOG_ERROR("MySQL Error");
 			exit(1);
 		}
-		con = mysql_real_connect(con, url.c_str(), User.c_str(), PassWord.c_str(), DBName.c_str(), Port, NULL, 0);
+		con = mysql_real_connect(con, url.c_str(), User.c_str(), PassWord.c_str(), DBName.c_str(), Port, NULL, 0);  //建立一个到mysql的连接
 
 		if (con == NULL)
 		{
@@ -110,7 +110,7 @@ void connection_pool::DestroyPool()
 		for (it = connList.begin(); it != connList.end(); ++it)
 		{
 			MYSQL *con = *it;
-			mysql_close(con);
+			mysql_close(con); //关闭mysql连接
 		}
 		m_CurConn = 0;
 		m_FreeConn = 0;
