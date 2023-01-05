@@ -131,6 +131,11 @@ connection_pool::~connection_pool()
 	DestroyPool();
 }
 
+/**
+ *
+ * @param SQL
+ * @param connPool
+ */
 connectionRAII::connectionRAII(MYSQL **SQL, connection_pool *connPool){
 	*SQL = connPool->GetConnection();
 	

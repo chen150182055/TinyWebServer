@@ -1,11 +1,17 @@
 #include "lst_timer.h"
 #include "../http/http_conn.h"
 
+/**
+ *
+ */
 sort_timer_lst::sort_timer_lst() {
     head = NULL;
     tail = NULL;
 }
 
+/**
+ *
+ */
 sort_timer_lst::~sort_timer_lst() {
     util_timer *tmp = head;
     while (tmp) {
@@ -15,6 +21,10 @@ sort_timer_lst::~sort_timer_lst() {
     }
 }
 
+/**
+ *
+ * @param timer
+ */
 void sort_timer_lst::add_timer(util_timer *timer) {
     if (!timer) {
         return;
@@ -32,6 +42,10 @@ void sort_timer_lst::add_timer(util_timer *timer) {
     add_timer(timer, head);
 }
 
+/**
+ *
+ * @param timer
+ */
 void sort_timer_lst::adjust_timer(util_timer *timer) {
     if (!timer) {
         return;
@@ -52,6 +66,10 @@ void sort_timer_lst::adjust_timer(util_timer *timer) {
     }
 }
 
+/**
+ *
+ * @param timer
+ */
 void sort_timer_lst::del_timer(util_timer *timer) {
     if (!timer) {
         return;
@@ -79,6 +97,9 @@ void sort_timer_lst::del_timer(util_timer *timer) {
     delete timer;
 }
 
+/**
+ *
+ */
 void sort_timer_lst::tick() {
     if (!head) {
         return;
@@ -100,6 +121,11 @@ void sort_timer_lst::tick() {
     }
 }
 
+/**
+ *
+ * @param timer
+ * @param lst_head
+ */
 void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head) {
     util_timer *prev = lst_head;
     util_timer *tmp = prev->next;
@@ -122,11 +148,20 @@ void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head) {
     }
 }
 
+/**
+ *
+ * @param timeslot
+ */
 void Utils::init(int timeslot) {
     m_TIMESLOT = timeslot;
 }
 
 //对文件描述符设置非阻塞
+/**
+ *
+ * @param fd
+ * @return
+ */
 int Utils::setnonblocking(int fd) {
     int old_option = fcntl(fd, F_GETFL);
     int new_option = old_option | O_NONBLOCK;
@@ -135,6 +170,13 @@ int Utils::setnonblocking(int fd) {
 }
 
 //将内核事件表注册读事件，ET模式，选择开启EPOLLONESHOT
+/**
+ *
+ * @param epollfd
+ * @param fd
+ * @param one_shot
+ * @param TRIGMode
+ */
 void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode) {
     epoll_event event;
     event.data.fd = fd;
@@ -151,6 +193,10 @@ void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode) {
 }
 
 //信号处理函数
+/**
+ *
+ * @param sig
+ */
 void Utils::sig_handler(int sig) {
     //为保证函数的可重入性，保留原来的errno
     int save_errno = errno;
@@ -160,6 +206,12 @@ void Utils::sig_handler(int sig) {
 }
 
 //设置信号函数
+/**
+ *
+ * @param sig
+ * @param handler
+ * @param restart
+ */
 void Utils::addsig(int sig, void(handler)(int), bool restart) {
     struct sigaction sa;
     memset(&sa, '\0', sizeof(sa));
@@ -171,11 +223,19 @@ void Utils::addsig(int sig, void(handler)(int), bool restart) {
 }
 
 //定时处理任务，重新定时以不断触发SIGALRM信号
+/**
+ *
+ */
 void Utils::timer_handler() {
     m_timer_lst.tick();
     alarm(m_TIMESLOT);
 }
 
+/**
+ *
+ * @param connfd
+ * @param info
+ */
 void Utils::show_error(int connfd, const char *info) {
     send(connfd, info, strlen(info), 0);
     close(connfd);
@@ -186,6 +246,10 @@ int Utils::u_epollfd = 0;
 
 class Utils;
 
+/**
+ *
+ * @param user_data
+ */
 void cb_func(client_data *user_data) {
     epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);
     assert(user_data);

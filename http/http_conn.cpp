@@ -292,6 +292,10 @@ http_conn::HTTP_CODE http_conn::parse_content(char *text) {
     return NO_REQUEST;
 }
 
+/**
+ *
+ * @return
+ */
 http_conn::HTTP_CODE http_conn::process_read() {
     LINE_STATUS line_status = LINE_OK;
     HTTP_CODE ret = NO_REQUEST;
@@ -332,6 +336,10 @@ http_conn::HTTP_CODE http_conn::process_read() {
     return NO_REQUEST;
 }
 
+/**
+ *
+ * @return
+ */
 http_conn::HTTP_CODE http_conn::do_request() {
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
@@ -445,6 +453,9 @@ http_conn::HTTP_CODE http_conn::do_request() {
     return FILE_REQUEST;
 }
 
+/**
+ *
+ */
 void http_conn::unmap() {
     if (m_file_address) {
         munmap(m_file_address, m_file_stat.st_size);
@@ -452,6 +463,10 @@ void http_conn::unmap() {
     }
 }
 
+/**
+ *
+ * @return
+ */
 bool http_conn::write() {
     int temp = 0;
 
@@ -498,6 +513,12 @@ bool http_conn::write() {
     }
 }
 
+/**
+ *
+ * @param format
+ * @param ...
+ * @return
+ */
 bool http_conn::add_response(const char *format, ...) {
     if (m_write_idx >= WRITE_BUFFER_SIZE)
         return false;
@@ -516,35 +537,73 @@ bool http_conn::add_response(const char *format, ...) {
     return true;
 }
 
+/**
+ *
+ * @param status
+ * @param title
+ * @return
+ */
 bool http_conn::add_status_line(int status, const char *title) {
     return add_response("%s %d %s\r\n", "HTTP/1.1", status, title);
 }
 
+/**
+ *
+ * @param content_len
+ * @return
+ */
 bool http_conn::add_headers(int content_len) {
     return add_content_length(content_len) && add_linger() &&
            add_blank_line();
 }
 
+/**
+ *
+ * @param content_len
+ * @return
+ */
 bool http_conn::add_content_length(int content_len) {
     return add_response("Content-Length:%d\r\n", content_len);
 }
 
+/**
+ *
+ * @return
+ */
 bool http_conn::add_content_type() {
     return add_response("Content-Type:%s\r\n", "text/html");
 }
 
+/**
+ *
+ * @return
+ */
 bool http_conn::add_linger() {
     return add_response("Connection:%s\r\n", (m_linger == true) ? "keep-alive" : "close");
 }
 
+/**
+ *
+ * @return
+ */
 bool http_conn::add_blank_line() {
     return add_response("%s", "\r\n");
 }
 
+/**
+ *
+ * @param content
+ * @return
+ */
 bool http_conn::add_content(const char *content) {
     return add_response("%s", content);
 }
 
+/**
+ *
+ * @param ret
+ * @return
+ */
 bool http_conn::process_write(HTTP_CODE ret) {
     switch (ret) {
         case INTERNAL_ERROR: {
@@ -596,6 +655,9 @@ bool http_conn::process_write(HTTP_CODE ret) {
     return true;
 }
 
+/**
+ *
+ */
 void http_conn::process() {
     HTTP_CODE read_ret = process_read();
     if (read_ret == NO_REQUEST) {

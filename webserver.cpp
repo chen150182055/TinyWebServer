@@ -1,5 +1,8 @@
 #include "webserver.h"
 
+/**
+ * 构造函数
+ */
 WebServer::WebServer() {
     //http_conn类对象
     users = new http_conn[MAX_FD];
@@ -16,6 +19,9 @@ WebServer::WebServer() {
     users_timer = new client_data[MAX_FD];
 }
 
+/**
+ * 析构函数
+ */
 WebServer::~WebServer() {
     close(m_epollfd);
     close(m_listenfd);
@@ -26,22 +32,39 @@ WebServer::~WebServer() {
     delete m_pool;
 }
 
+/**
+ * 初始化
+ * @param port
+ * @param user
+ * @param passWord
+ * @param databaseName
+ * @param log_write
+ * @param opt_linger
+ * @param trigmode
+ * @param sql_num
+ * @param thread_num
+ * @param close_log
+ * @param actor_model
+ */
 void WebServer::init(int port, string user, string passWord, string databaseName, int log_write,
-                     int opt_linger, int trigmode, int sql_num, int thread_num, int close_log, int actor_model) {
-    m_port = port;
-    m_user = user;
-    m_passWord = passWord;
-    m_databaseName = databaseName;
-    m_sql_num = sql_num;
-    m_thread_num = thread_num;
-    m_log_write = log_write;
-    m_OPT_LINGER = opt_linger;
-    m_TRIGMode = trigmode;
-    m_close_log = close_log;
-    m_actormodel = actor_model;
+                     int opt_linger, int trigmode, int sql_num, int thread_num, int close_log, int actor_model) {   //初始化
+    m_port = port;  //初始化端口号
+    m_user = user;  //初始化用户
+    m_passWord = passWord;  //初始化密码
+    m_databaseName = databaseName;  //初始化数据库名称
+    m_sql_num = sql_num;            //初始化数据库数量
+    m_thread_num = thread_num;      //初始化线程池
+    m_log_write = log_write;        //初始化日志
+    m_OPT_LINGER = opt_linger;      //初始化
+    m_TRIGMode = trigmode;          //初始化触发模式
+    m_close_log = close_log;        //初始化
+    m_actormodel = actor_model;     //初始化
 }
 
-void WebServer::trig_mode() {
+/**
+ *
+ */
+void WebServer::trig_mode() {   //触发模式
     //LT + LT
     if (0 == m_TRIGMode) {
         m_LISTENTrigmode = 0;
@@ -64,7 +87,10 @@ void WebServer::trig_mode() {
     }
 }
 
-void WebServer::log_write() {
+/**
+ *
+ */
+void WebServer::log_write() {   //日志
     if (0 == m_close_log) {
         //初始化日志
         if (1 == m_log_write)
@@ -74,7 +100,10 @@ void WebServer::log_write() {
     }
 }
 
-void WebServer::sql_pool() {
+/**
+ *
+ */
+void WebServer::sql_pool() {    //数据库
     //初始化数据库连接池
     m_connPool = connection_pool::GetInstance();
     m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
@@ -83,12 +112,18 @@ void WebServer::sql_pool() {
     users->initmysql_result(m_connPool);
 }
 
-void WebServer::thread_pool() {
+/**
+ *
+ */
+void WebServer::thread_pool() {     //线程池
     //线程池
     m_pool = new threadpool<http_conn>(m_actormodel, m_connPool, m_thread_num);
 }
 
-void WebServer::eventListen() {
+/**
+ *
+ */
+void WebServer::eventListen() {     //监听
     //网络编程基础步骤
     m_listenfd = socket(PF_INET, SOCK_STREAM, 0);
     assert(m_listenfd >= 0);
@@ -142,7 +177,12 @@ void WebServer::eventListen() {
     Utils::u_epollfd = m_epollfd;
 }
 
-void WebServer::timer(int connfd, struct sockaddr_in client_address) {
+/**
+ *
+ * @param connfd
+ * @param client_address
+ */
+void WebServer::timer(int connfd, struct sockaddr_in client_address) {      //
     users[connfd].init(connfd, client_address, m_root, m_CONNTrigmode, m_close_log, m_user, m_passWord, m_databaseName);
 
     //初始化client_data数据
@@ -158,9 +198,11 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address) {
     utils.m_timer_lst.add_timer(timer);
 }
 
-//若有数据传输，则将定时器往后延迟3个单位
-//并对新的定时器在链表上的位置进行调整
-void WebServer::adjust_timer(util_timer *timer) {
+/**
+ * 若有数据传输，则将定时器往后延迟3个单位，并对新的定时器在链表上的位置进行调整
+ * @param timer
+ */
+void WebServer::adjust_timer(util_timer *timer) {       //
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
     utils.m_timer_lst.adjust_timer(timer);
@@ -168,6 +210,11 @@ void WebServer::adjust_timer(util_timer *timer) {
     LOG_INFO("%s", "adjust timer once");
 }
 
+/**
+ *
+ * @param timer
+ * @param sockfd
+ */
 void WebServer::deal_timer(util_timer *timer, int sockfd) {
     timer->cb_func(&users_timer[sockfd]);
     if (timer) {
@@ -177,6 +224,10 @@ void WebServer::deal_timer(util_timer *timer, int sockfd) {
     LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
 }
 
+/**
+ *
+ * @return
+ */
 bool WebServer::dealclinetdata() {
     struct sockaddr_in client_address;
     socklen_t client_addrlength = sizeof(client_address);
@@ -211,6 +262,12 @@ bool WebServer::dealclinetdata() {
     return true;
 }
 
+/**
+ *
+ * @param timeout
+ * @param stop_server
+ * @return
+ */
 bool WebServer::dealwithsignal(bool &timeout, bool &stop_server) {
     int ret = 0;
     int sig;
@@ -237,6 +294,10 @@ bool WebServer::dealwithsignal(bool &timeout, bool &stop_server) {
     return true;
 }
 
+/**
+ *
+ * @param sockfd
+ */
 void WebServer::dealwithread(int sockfd) {
     util_timer *timer = users_timer[sockfd].timer;
 
@@ -276,6 +337,10 @@ void WebServer::dealwithread(int sockfd) {
     }
 }
 
+/**
+ *
+ * @param sockfd
+ */
 void WebServer::dealwithwrite(int sockfd) {
     util_timer *timer = users_timer[sockfd].timer;
     //reactor
@@ -310,6 +375,9 @@ void WebServer::dealwithwrite(int sockfd) {
     }
 }
 
+/**
+ *
+ */
 void WebServer::eventLoop() {
     bool timeout = false;
     bool stop_server = false;

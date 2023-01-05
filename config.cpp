@@ -1,5 +1,8 @@
 #include "config.h"
 
+/**
+ *
+ */
 Config::Config() {
     //端口号,默认9006
     PORT = 9006;
@@ -32,6 +35,11 @@ Config::Config() {
     actor_model = 0;
 }
 
+/**
+ *
+ * @param argc
+ * @param argv
+ */
 void Config::parse_arg(int argc, char *argv[]) {
     int opt;
     const char *str = "p:l:m:o:s:t:c:a:";

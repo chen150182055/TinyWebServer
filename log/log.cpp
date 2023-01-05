@@ -7,11 +7,17 @@
 
 using namespace std;
 
+/**
+ *
+ */
 Log::Log() {
     m_count = 0;
     m_is_async = false;
 }
 
+/**
+ *
+ */
 Log::~Log() {
     if (m_fp != NULL) {
         fclose(m_fp);
@@ -19,6 +25,15 @@ Log::~Log() {
 }
 
 //异步需要设置阻塞队列的长度，同步不需要设置
+/**
+ *
+ * @param file_name
+ * @param close_log
+ * @param log_buf_size
+ * @param split_lines
+ * @param max_queue_size
+ * @return
+ */
 bool Log::init(const char *file_name, int close_log, int log_buf_size, int split_lines, int max_queue_size) {
     //如果设置了max_queue_size,则设置为异步
     if (max_queue_size >= 1) {
@@ -63,6 +78,12 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
     return true;
 }
 
+/**
+ *
+ * @param level
+ * @param format
+ * @param ...
+ */
 void Log::write_log(int level, const char *format, ...) {
     struct timeval now = {0, 0};
     gettimeofday(&now, NULL);
@@ -142,6 +163,9 @@ void Log::write_log(int level, const char *format, ...) {
     va_end(valst);
 }
 
+/**
+ *
+ */
 void Log::flush(void) {
     m_mutex.lock();
     //强制刷新写入流缓冲区
