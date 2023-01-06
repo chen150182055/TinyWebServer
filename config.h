@@ -5,8 +5,9 @@
 
 using namespace std;
 
+//Config类
 class Config {
-public:
+public:     //公有成员
     Config();
 
     ~Config() {};

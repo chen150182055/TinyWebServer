@@ -8,7 +8,7 @@
 using namespace std;
 
 /**
- *
+ * 构造函数
  */
 Log::Log() {
     m_count = 0;
@@ -16,7 +16,7 @@ Log::Log() {
 }
 
 /**
- *
+ * 析构函数
  */
 Log::~Log() {
     if (m_fp != NULL) {
@@ -26,7 +26,7 @@ Log::~Log() {
 
 //异步需要设置阻塞队列的长度，同步不需要设置
 /**
- *
+ * 初始化
  * @param file_name
  * @param close_log
  * @param log_buf_size
@@ -79,9 +79,9 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
 }
 
 /**
- *
- * @param level
- * @param format
+ * 写日志
+ * @param level 日志等级
+ * @param format 日志格式
  * @param ...
  */
 void Log::write_log(int level, const char *format, ...) {
@@ -164,7 +164,7 @@ void Log::write_log(int level, const char *format, ...) {
 }
 
 /**
- *
+ * 刷新缓冲区
  */
 void Log::flush(void) {
     m_mutex.lock();

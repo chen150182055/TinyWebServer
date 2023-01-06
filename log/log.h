@@ -10,31 +10,52 @@
 
 using namespace std;
 
+//Log类
 class Log {
-public:
-    //C++11以后,使用局部变量懒汉不用加锁
+public:     //公有成员
+
+    /**
+     * C++11以后,使用局部变量懒汉不用加锁
+     * @return
+     */
     static Log *get_instance() {
         static Log instance;
         return &instance;
     }
 
+    /**
+     *
+     * @param args
+     * @return
+     */
     static void *flush_log_thread(void *args) {
         Log::get_instance()->async_write_log();
     }
 
-    //可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
-    bool init(const char *file_name, int close_log, int log_buf_size = 8192, int split_lines = 5000000,
-              int max_queue_size = 0);
+    /**
+     * 可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
+     * @param file_name
+     * @param close_log
+     * @param log_buf_size
+     * @param split_lines
+     * @param max_queue_size
+     * @return
+     */
+    bool init(const char *file_name, int close_log, int log_buf_size = 8192, int split_lines = 5000000,int max_queue_size = 0);
 
     void write_log(int level, const char *format, ...);
 
     void flush(void);
 
-private:
+private:    //私有成员
     Log();
 
     virtual ~Log();
 
+    /**
+     *
+     * @return
+     */
     void *async_write_log() {
         string single_log;
         //从阻塞队列中取出一个日志string，写入文件
@@ -45,7 +66,7 @@ private:
         }
     }
 
-private:
+private:    //私有成员
     char dir_name[128]; //路径名
     char log_name[128]; //log文件名
     int m_split_lines;  //日志最大行数

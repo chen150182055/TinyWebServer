@@ -4,19 +4,17 @@
  * 构造函数
  */
 WebServer::WebServer() {
-    //http_conn类对象
-    users = new http_conn[MAX_FD];
 
-    //root文件夹路径
-    char server_path[200];
-    getcwd(server_path, 200);
+    users = new http_conn[MAX_FD];  //http_conn类对象
+
+    char server_path[200];  //root文件夹路径
+    getcwd(server_path, 200);   //获取当前工作路径,将值存放在server_path中,200为空间大小
     char root[6] = "/root";
-    m_root = (char *) malloc(strlen(server_path) + strlen(root) + 1);
-    strcpy(m_root, server_path);
-    strcat(m_root, root);
+    m_root = (char *) malloc(strlen(server_path) + strlen(root) + 1);  //计算server_path和root的长度和
+    strcpy(m_root, server_path);    //将server_path复制到m_root
+    strcat(m_root, root);           //将root复制到m_root
 
-    //定时器
-    users_timer = new client_data[MAX_FD];
+    users_timer = new client_data[MAX_FD];  //定时器
 }
 
 /**
@@ -116,7 +114,6 @@ void WebServer::sql_pool() {    //数据库
  *
  */
 void WebServer::thread_pool() {     //线程池
-    //线程池
     m_pool = new threadpool<http_conn>(m_actormodel, m_connPool, m_thread_num);
 }
 

@@ -24,6 +24,7 @@
 #include <time.h>
 #include "../log/log.h"
 
+//util_timer类声明
 class util_timer;
 
 struct client_data {
@@ -32,11 +33,12 @@ struct client_data {
     util_timer *timer;
 };
 
+//util_timer类
 class util_timer {
-public:
+public:     //公有成员
     util_timer() : prev(NULL), next(NULL) {}
 
-public:
+public:     //公有成员
     time_t expire;
 
     void (*cb_func)(client_data *);
@@ -46,8 +48,9 @@ public:
     util_timer *next;
 };
 
+//sort_timer_lst类
 class sort_timer_lst {
-public:
+public:     //公有成员
     sort_timer_lst();
 
     ~sort_timer_lst();
@@ -60,15 +63,16 @@ public:
 
     void tick();
 
-private:
+private:    //私有成员
     void add_timer(util_timer *timer, util_timer *lst_head);
 
     util_timer *head;
     util_timer *tail;
 };
 
+//Utils类
 class Utils {
-public:
+public:     //公有成员
     Utils() {}
 
     ~Utils() {}
@@ -92,7 +96,7 @@ public:
 
     void show_error(int connfd, const char *info);
 
-public:
+public:     //公有成员
     static int *u_pipefd;
     sort_timer_lst m_timer_lst;
     static int u_epollfd;

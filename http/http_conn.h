@@ -27,11 +27,13 @@
 #include "../timer/lst_timer.h"
 #include "../log/log.h"
 
+//http_conn类
 class http_conn {
-public:
+public:     //公有成员
     static const int FILENAME_LEN = 200;
     static const int READ_BUFFER_SIZE = 2048;
     static const int WRITE_BUFFER_SIZE = 1024;
+
     enum METHOD {
         GET = 0,
         POST,
@@ -43,11 +45,13 @@ public:
         CONNECT,
         PATH
     };
+
     enum CHECK_STATE {
         CHECK_STATE_REQUESTLINE = 0,
         CHECK_STATE_HEADER,
         CHECK_STATE_CONTENT
     };
+
     enum HTTP_CODE {
         NO_REQUEST,
         GET_REQUEST,
@@ -58,18 +62,19 @@ public:
         INTERNAL_ERROR,
         CLOSED_CONNECTION
     };
+
     enum LINE_STATUS {
         LINE_OK = 0,
         LINE_BAD,
         LINE_OPEN
     };
 
-public:
+public:     //私有成员
     http_conn() {}
 
     ~http_conn() {}
 
-public:
+public:     //公有成员
     void init(int sockfd, const sockaddr_in &addr, char *, int, int, string user, string passwd, string sqlname);
 
     void close_conn(bool real_close = true);
@@ -90,7 +95,7 @@ public:
     int improv;
 
 
-private:
+private:    //私有成员
     void init();
 
     HTTP_CODE process_read();
@@ -127,13 +132,13 @@ private:
 
     bool add_blank_line();
 
-public:
+public:     //公有成员
     static int m_epollfd;
     static int m_user_count;
     MYSQL *mysql;
     int m_state;  //读为0, 写为1
 
-private:
+private:    //私有成员
     int m_sockfd;
     sockaddr_in m_address;
     char m_read_buf[READ_BUFFER_SIZE];

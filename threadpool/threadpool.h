@@ -8,9 +8,10 @@
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
 
+//
 template<typename T>
 class threadpool {
-public:
+public:     //公有成员
     /*thread_number是线程池中线程的数量，max_requests是请求队列中最多允许的、等待处理的请求的数量*/
     threadpool(int actor_model, connection_pool *connPool, int thread_number = 8, int max_request = 10000);
 
@@ -20,13 +21,13 @@ public:
 
     bool append_p(T *request);
 
-private:
+private:    //私有成员
     /*工作线程运行的函数，它不断从工作队列中取出任务并执行之*/
     static void *worker(void *arg);
 
     void run();
 
-private:
+private:    //私有成员
     int m_thread_number;        //线程池中的线程数
     int m_max_requests;         //请求队列中允许的最大请求数
     pthread_t *m_threads;       //描述线程池的数组，其大小为m_thread_number
@@ -37,6 +38,15 @@ private:
     int m_actor_model;          //模型切换
 };
 
+
+/**
+ *
+ * @tparam T
+ * @param actor_model
+ * @param connPool
+ * @param thread_number
+ * @param max_requests
+ */
 template<typename T>
 threadpool<T>::threadpool(int actor_model, connection_pool *connPool, int thread_number, int max_requests)
         : m_actor_model(actor_model), m_thread_number(thread_number), m_max_requests(max_requests), m_threads(NULL),
@@ -58,11 +68,22 @@ threadpool<T>::threadpool(int actor_model, connection_pool *connPool, int thread
     }
 }
 
+/**
+ *
+ * @tparam T
+ */
 template<typename T>
 threadpool<T>::~threadpool() {
     delete[] m_threads;
 }
 
+/**
+ *
+ * @tparam T
+ * @param request
+ * @param state
+ * @return
+ */
 template<typename T>
 bool threadpool<T>::append(T *request, int state) {
     m_queuelocker.lock();
@@ -77,6 +98,12 @@ bool threadpool<T>::append(T *request, int state) {
     return true;
 }
 
+/**
+ *
+ * @tparam T
+ * @param request
+ * @return
+ */
 template<typename T>
 bool threadpool<T>::append_p(T *request) {
     m_queuelocker.lock();
@@ -90,6 +117,12 @@ bool threadpool<T>::append_p(T *request) {
     return true;
 }
 
+/**
+ *
+ * @tparam T
+ * @param arg
+ * @return
+ */
 template<typename T>
 void *threadpool<T>::worker(void *arg) {
     threadpool *pool = (threadpool *) arg;
@@ -97,6 +130,10 @@ void *threadpool<T>::worker(void *arg) {
     return pool;
 }
 
+/**
+ *
+ * @tparam T
+ */
 template<typename T>
 void threadpool<T>::run() {
     while (true) {

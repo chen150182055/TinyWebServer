@@ -19,8 +19,9 @@ const int MAX_FD = 65536;           //最大文件描述符
 const int MAX_EVENT_NUMBER = 10000; //最大事件数
 const int TIMESLOT = 5;             //最小超时单位
 
+//WebServer类
 class WebServer {
-public:
+public:     //公有成员
     WebServer();
 
     ~WebServer();
@@ -55,7 +56,7 @@ public:
 
     void dealwithwrite(int sockfd);
 
-public:
+public:     //公有成员
     //基础
     int m_port;     //端口号
     char *m_root;   //

@@ -14,9 +14,15 @@
 
 using namespace std;
 
+//
 template<class T>
 class block_queue {
-public:
+public:     //公有成员
+
+    /**
+     * 构造函数
+     * @param max_size
+     */
     block_queue(int max_size = 1000) {
         if (max_size <= 0) {
             exit(-1);
@@ -29,6 +35,9 @@ public:
         m_back = -1;
     }
 
+    /**
+     *
+     */
     void clear() {
         m_mutex.lock();
         m_size = 0;
@@ -37,6 +46,9 @@ public:
         m_mutex.unlock();
     }
 
+    /**
+     * 析构函数
+     */
     ~block_queue() {
         m_mutex.lock();
         if (m_array != NULL)
@@ -45,7 +57,10 @@ public:
         m_mutex.unlock();
     }
 
-    //判断队列是否满了
+    /**
+     * 判断队列是否满了
+     * @return
+     */
     bool full() {
         m_mutex.lock();
         if (m_size >= m_max_size) {
@@ -57,7 +72,10 @@ public:
         return false;
     }
 
-    //判断队列是否为空
+    /**
+     * 判断队列是否为空
+     * @return
+     */
     bool empty() {
         m_mutex.lock();
         if (0 == m_size) {
@@ -68,7 +86,11 @@ public:
         return false;
     }
 
-    //返回队首元素
+    /**
+     * 返回队首元素
+     * @param value
+     * @return
+     */
     bool front(T &value) {
         m_mutex.lock();
         if (0 == m_size) {
@@ -80,7 +102,11 @@ public:
         return true;
     }
 
-    //返回队尾元素
+    /**
+     * 返回队尾元素
+     * @param value
+     * @return
+     */
     bool back(T &value) {
         m_mutex.lock();
         if (0 == m_size) {
@@ -92,6 +118,10 @@ public:
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     int size() {
         int tmp = 0;
 
@@ -102,6 +132,10 @@ public:
         return tmp;
     }
 
+    /**
+     *
+     * @return
+     */
     int max_size() {
         int tmp = 0;
 
@@ -112,9 +146,13 @@ public:
         return tmp;
     }
 
-    //往队列添加元素，需要将所有使用队列的线程先唤醒
-    //当有元素push进队列,相当于生产者生产了一个元素
-    //若当前没有线程等待条件变量,则唤醒无意义
+    /**
+     * 往队列添加元素，需要将所有使用队列的线程先唤醒
+     * 当有元素push进队列,相当于生产者生产了一个元素
+     * 若当前没有线程等待条件变量,则唤醒无意义
+     * @param item
+     * @return
+     */
     bool push(const T &item) {
 
         m_mutex.lock();
@@ -135,7 +173,11 @@ public:
         return true;
     }
 
-    //pop时,如果当前队列没有元素,将会等待条件变量
+    /**
+     * pop时,如果当前队列没有元素,将会等待条件变量
+     * @param item
+     * @return
+     */
     bool pop(T &item) {
 
         m_mutex.lock();
@@ -154,7 +196,12 @@ public:
         return true;
     }
 
-    //增加了超时处理
+    /**
+     * 增加了超时处理
+     * @param item
+     * @param ms_timeout
+     * @return
+     */
     bool pop(T &item, int ms_timeout) {
         struct timespec t = {0, 0};
         struct timeval now = {0, 0};
@@ -181,7 +228,7 @@ public:
         return true;
     }
 
-private:
+private:    //私有成员
     locker m_mutex;
     cond m_cond;
 
